@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Descubra o Nome!</title>
+<style>
+  :root {
+    --ok: #4caf50;
+    --err: #f44336;
+    --bg1: #ffe0f0;
+    --bg2: #fff6fa;
+    --accent: #ff5c93;
+    --ink: #333;
+    --panel: rgba(255,255,255,0.8);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--ink);
+  }
+  .screen { display: none; flex-direction: column; align-items: flex-start; }
+  .visible { display: flex; }
+  .fade-in { animation: fadeIn 0.6s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== Tela inicial ===== */
+  #inicio { align-items: center; text-align: center; gap: 8px; background: var(--panel); padding: 36px 48px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: min(90%, 520px); }
+  #inicio h1 { margin: 0; font-size: 2.2rem; color: var(--accent); letter-spacing: .5px; }
+  #inicio p { margin: 6px 0 16px; font-size: 1.1rem; color: #444; }
+  #comecar-btn { background-color: var(--accent); color: #fff; padding: 12px 26px; font-size: 1rem; font-weight: 600; border: none; border-radius: 12px; margin-top: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; }
+  #comecar-btn:hover { background-color: #ff407e; transform: scale(1.05); }
+
+  /* ===== Fases ===== */
+  #fase1, #fase2 { flex-direction: column; gap: 8px; background: var(--panel); padding: 25px 35px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: min(90%, 520px); }
+  .section-title { color: var(--accent); font-size: 1.6rem; font-weight: 700; margin: 0 0 4px 0; align-self: flex-start; }
+  .highlight { background-color: #fff0f5; border: 2px solid #ffd6e8; padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 1.05rem; color: #333; margin-bottom: 6px; }
+  .game-stats { display: flex; justify-content: flex-start; gap: 20px; font-size: 1.1rem; width: 100%; margin-bottom: 2px; }
+  .stat-box { display: flex; align-items: center; gap: 6px; }
+  .heart { color: #ff4d6d; font-size: 1.3rem; transition: opacity 0.3s ease, transform 0.3s ease; }
+  .heart.lost { opacity: 0.3; transform: scale(0.8); }
+  .alphabet { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 6px; align-self: center; }
+  button.letter-btn { border: none; background: #fff; font-weight: 600; border-radius: 8px; padding: 10px; cursor: pointer; transition: background-color 0.4s ease, color 0.4s ease, transform 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  button.letter-btn:hover:not(.correct):not(.wrong) { background: #ffe0ec; }
+  button.letter-btn:disabled { opacity: .6; cursor: not-allowed; }
+  button.correct { background-color: #4caf50 !important; color: white !important; transform: scale(1.1); }
+  button.wrong { background-color: #f44336 !important; color: white !important; transform: scale(0.95); }
+  #message { font-size: 1.1rem; font-weight: 500; min-height: 1.4em; align-self: center; }
+
+  #restart-btn, #next-btn, .cta { background-color: var(--accent); color: #fff; padding: 12px 26px; font-size: 1rem; font-weight: 600; border: none; border-radius: 12px; margin-top: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease, opacity .2s ease, filter .2s ease; align-self: center; }
+  #restart-btn, #next-btn { display: none; }
+  #restart-btn:hover, #next-btn:hover, .cta:hover { background-color: #ff407e; transform: scale(1.05); }
+  .cta:disabled { opacity: .45; filter: saturate(0.6) grayscale(0.2); cursor: not-allowed; }
+
+  /* ===== Fase 2 layout ===== */
+  .letras-escolhidas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; max-width: 420px; align-self: center; justify-content: center; }
+  .slots { display: grid; grid-template-columns: repeat(5, 64px); gap: 10px; margin-top: 6px; align-self: center; }
+  .slotbox { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px; }
+  .slot { width: 58px; height: 58px; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background-color: #fff; border-radius: 10px; user-select: none; }
+  .slot.filled { border-color: #333; }
+  .remove-btn { display: none; font-size: .75rem; padding: 4px 8px; border-radius: 999px; border: 1px solid #d0d0d0; background: #fff; color: #333; cursor: pointer; }
+  .slotbox.filled .remove-btn { display: inline-block; }
+
+  /* ===== Modais ===== */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal.visible { display: flex; }
+  .modal-card { background: #fff; border-radius: 20px; padding: 40px 32px; width: min(90%, 520px); box-shadow: 0 10px 30px rgba(0,0,0,0.25); position: relative; overflow: hidden; text-align: center; }
+  .modal-card h3 { margin: 0; font-size: 1.8rem; color: var(--accent); }
+  .modal-card p { margin: 16px 0 20px; font-size: 1.2rem; }
+  .modal-card .nome-destaque { font-size: 3.2rem; font-weight: 800; color: var(--accent); display: block; margin: 12px 0; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+  .btn { padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.ghost { background: #f2f2f2; color: #333; }
+
+  /* Confete */
+  .confetti { position: absolute; width: 8px; height: 14px; top: -10px; opacity: .9; }
+  @keyframes fall { to { transform: translateY(520px) rotate(360deg); opacity: 1; } }
+</style>
+</head>
+<body>
+  <!-- INÍCIO -->
+  <div id="inicio" class="screen visible fade-in" aria-label="Tela inicial">
+    <h1>🎀 Descubra o nome da bebê 🎀</h1>
+    <p>Será que você consegue adivinhar o nome?</p>
+    <button id="comecar-btn">Começar</button>
+  </div>
+
+  <!-- FASE 1 -->
+  <div id="fase1" class="screen" aria-label="Fase 1">
+    <h2 class="section-title">Fase 1</h2>
+    <p class="highlight">💡 Você tem <strong>7 vidas</strong> para acertar as possíveis <strong>10 letras do nome</strong>!</p>
+    <div class="game-stats">
+      <div class="stat-box">
+        <p><strong>Acertos:</strong> <span id="acertos">0</span>/10</p>
+      </div>
+      <div class="stat-box" id="vidas">
+        <p><strong>Vidas:</strong></p>
+      </div>
+    </div>
+    <div class="alphabet" id="alphabet"></div>
+    <div id="message"></div>
+    <button id="restart-btn">🔄 Tentar novamente</button>
+    <button id="next-btn">➡️ Ir para Fase 2</button>
+  </div>
+
+  <!-- FASE 2 -->
+  <div id="fase2" class="screen" aria-label="Fase 2">
+    <h2 class="section-title">Fase 2</h2>
+    <p class="highlight">Agora monte o nome usando as letras que você descobriu!</p>
+    <p class="info" style="margin:0 0 6px 0;">O nome tem <strong>5 letras diferentes</strong>.</p>
+    <div class="letras-escolhidas" id="letras-escolhidas"></div>
+    <div class="slots" id="slots">
+      <div class="slotbox"><div class="slot" id="s1"></div><button class="remove-btn" data-rm="1">remover</button></div>
+      <div class="slotbox"><div class="slot" id="s2"></div><button class="remove-btn" data-rm="2">remover</button></div>
+      <div class="slotbox"><div class="slot" id="s3"></div><button class="remove-btn" data-rm="3">remover</button></div>
+      <div class="slotbox"><div class="slot" id="s4"></div><button class="remove-btn" data-rm="4">remover</button></div>
+      <div class="slotbox"><div class="slot" id="s5"></div><button class="remove-btn" data-rm="5">remover</button></div>
+    </div>
+    <button id="revelar-btn" class="cta" disabled>🎁 Revelar</button>
+    <div id="status2" style="min-height:1.6em; margin-top:8px; align-self:center;"></div>
+  </div>
+
+  <!-- MODAIS -->
+  <div id="modal-erro" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>😅 Não foi dessa vez</h3>
+      <p>Tente outra combinação de letras.</p>
+      <div class="modal-actions">
+        <button id="btn-erro-tentar" class="btn primary">Tentar novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-sucesso" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card" id="modal-sucesso-card">
+      <h3>🎉 Você acertou!</h3>
+      <p>O nome é</p>
+      <span class="nome-destaque">JÚLIA 💖</span>
+      <div class="modal-actions">
+        <button id="btn-sucesso-ok" class="btn primary">Oba!</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ===== Estado & constantes =====
+const correctLetters = ['A','C','E','I','J','L','M','O','R','U'];
+const TARGET = 'JULIA'; // validação sem acento
+const TARGET_REVEAL = 'JÚLIA'; // exibição com acento
+let vidas = 7;
+let correctCount = 0;
+let slotIndex = 0;
+
+// ===== Elementos comuns =====
+const inicioDiv = document.getElementById('inicio');
+const comecarBtn = document.getElementById('comecar-btn');
+const fase1Div = document.getElementById('fase1');
+const fase2Div = document.getElementById('fase2');
+const alphabetDiv = document.getElementById('alphabet');
+const message = document.getElementById('message');
+const acertosSpan = document.getElementById('acertos');
+const restartBtn = document.getElementById('restart-btn');
+const nextBtn = document.getElementById('next-btn');
+const vidasDiv = document.getElementById('vidas');
+
+// ===== Elementos Fase 2 =====
+const letrasDiv = document.getElementById('letras-escolhidas');
+const slotsDiv = document.getElementById('slots');
+const revelarBtn = document.getElementById('revelar-btn');
+const status2 = document.getElementById('status2');
+const modalErro = document.getElementById('modal-erro');
+const modalSucesso = document.getElementById('modal-sucesso');
+const modalSucessoCard = document.getElementById('modal-sucesso-card');
+const btnErroTentar = document.getElementById('btn-erro-tentar');
+const btnSucessoOk = document.getElementById('btn-sucesso-ok');
+
+// ===== Tela inicial -> Fase 1 =====
+comecarBtn.addEventListener('click', () => {
+  inicioDiv.classList.remove('visible');
+  fase1Div.classList.add('visible');
+  fase1Div.classList.add('fade-in');
+});
+
+// ===== Corações (vidas) =====
+function renderHearts() {
+  const heartsContainer = document.createElement('span');
+  heartsContainer.id = 'hearts-container';
+  for (let i = 0; i < 7; i++) {
+    const heart = document.createElement('span');
+    heart.textContent = '❤️';
+    heart.classList.add('heart');
+    heartsContainer.appendChild(heart);
+  }
+  vidasDiv.appendChild(heartsContainer);
+  updateHearts();
+}
+function updateHearts() {
+  const hearts = document.querySelectorAll('#hearts-container .heart');
+  hearts.forEach((heart, i) => { if (i < (7 - vidas)) heart.classList.add('lost'); else heart.classList.remove('lost'); });
+}
+renderHearts();
+
+// ===== Monta alfabeto Fase 1 =====
+for (let i = 65; i <= 90; i++) {
+  const letter = String.fromCharCode(i);
+  const btn = document.createElement('button');
+  btn.textContent = letter;
+  btn.classList.add('letter-btn');
+  btn.onclick = () => checkLetter(btn, letter);
+  alphabetDiv.appendChild(btn);
+}
+
+function checkLetter(btn, letter) {
+  if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+
+  if (correctLetters.includes(letter)) {
+    btn.classList.add('correct');
+    correctCount++; acertosSpan.textContent = correctCount;
+  } else {
+    btn.classList.add('wrong');
+    vidas--; updateHearts();
+  }
+
+  if (correctCount === correctLetters.length) {
+    message.textContent = '🎉 Você acertou todas as letras!';
+    nextBtn.style.display = 'inline-block'; // avanço manual
+  } else if (vidas === 0) {
+    message.textContent = '💔 Suas vidas acabaram!';
+    document.querySelectorAll('#alphabet button').forEach(b => b.disabled = true);
+    restartBtn.style.display = 'inline-block';
+  }
+}
+
+// ===== Navegação =====
+function goToPhase2() {
+  fase1Div.classList.remove('visible');
+  fase2Div.classList.add('visible');
+  resetFase2();
+  buildBank();
+}
+nextBtn.addEventListener('click', goToPhase2);
+
+restartBtn.onclick = () => {
+  vidas = 7; correctCount = 0;
+  acertosSpan.textContent = 0; message.textContent = '';
+  restartBtn.style.display = 'none'; nextBtn.style.display = 'none';
+  updateHearts();
+  document.querySelectorAll('#alphabet button').forEach(b => { b.classList.remove('correct', 'wrong'); b.disabled = false; });
+};
+
+// ===== Fase 2 =====
+function buildBank() {
+  letrasDiv.innerHTML = '';
+  correctLetters.forEach(l => {
+    const btn = document.createElement('button');
+    btn.textContent = l; btn.classList.add('letter-btn');
+    btn.onclick = () => addLetterFromBank(btn, l);
+    letrasDiv.appendChild(btn);
+  });
+}
+
+function resetFase2() {
+  for (let i = 1; i <= 5; i++) {
+    const slot = document.getElementById('s'+i); const box = slot.parentElement;
+    slot.textContent = ''; slot.removeAttribute('data-letter');
+    slot.classList.remove('filled'); box.classList.remove('filled');
+  }
+  slotIndex = 0; status2.textContent = ''; status2.className = '';
+  revelarBtn.disabled = true;
+}
+
+function firstEmptySlotIndex() {
+  for (let i = 1; i <= 5; i++) { if (!document.getElementById('s'+i).dataset.letter) return i-1; }
+  return 5;
+}
+
+function addLetterFromBank(btn, l) {
+  if (btn.disabled || slotIndex >= 5) return;
+  const slot = document.getElementById('s'+(slotIndex+1)); const box = slot.parentElement;
+  slot.textContent = l; slot.dataset.letter = l;
+  slot.classList.add('filled'); box.classList.add('filled');
+  btn.disabled = true;
+  slotIndex = firstEmptySlotIndex();
+  updateRevelarState();
+}
+
+function updateRevelarState() { revelarBtn.disabled = (getSlotsString().length !== 5); }
+
+// remover via botões "remover"
+slotsDiv.addEventListener('click', (e) => {
+  const btn = e.target.closest('.remove-btn'); if (!btn) return; const n = Number(btn.getAttribute('data-rm'));
+  removeLetterFromSlot(n);
+});
+
+function removeLetterFromSlot(slotNumber) {
+  const slot = document.getElementById('s'+slotNumber); const box = slot.parentElement; const l = slot.dataset.letter || '';
+  if (!l) return;
+  const bankBtn = Array.from(letrasDiv.querySelectorAll('button')).find(b => b.textContent === l);
+  if (bankBtn) bankBtn.disabled = false;
+  slot.textContent = ''; slot.removeAttribute('data-letter'); slot.classList.remove('filled'); box.classList.remove('filled');
+  slotIndex = Math.min(slotNumber-1, firstEmptySlotIndex()); updateRevelarState();
+}
+
+function getSlotsString() { let s = ''; for (let i = 1; i <= 5; i++) { const sl = document.getElementById('s'+i); s += sl.dataset.letter ? sl.dataset.letter : ''; } return s; }
+
+// ===== Modais & Confete =====
+function openModal(el) { el.classList.add('visible'); el.setAttribute('aria-hidden','false'); }
+function closeModal(el) { el.classList.remove('visible'); el.setAttribute('aria-hidden','true'); }
+
+function launchConfetti(container) {
+  const colors = ['#ff5c93','#ffd166','#06d6a0','#118ab2','#ef476f','#8E7dbe'];
+  for (let i = 0; i < 120; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti';
+    piece.style.left = Math.random()*100 + '%';
+    piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.transform = `translateY(-20px) rotate(${Math.random()*360}deg)`;
+    piece.style.animation = `fall ${2 + Math.random()*2}s ease-out forwards`;
+    piece.style.opacity = Math.random()*0.9 + 0.1;
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.querySelectorAll('.confetti').forEach(n => n.remove()); }, 4500);
+}
+
+revelarBtn.addEventListener('click', () => {
+  const tentativa = getSlotsString();
+  if (tentativa === TARGET) {
+    openModal(modalSucesso);
+    launchConfetti(modalSucessoCard);
+  } else {
+    openModal(modalErro);
+  }
+});
+
+const btnErroTentarEl = document.getElementById('btn-erro-tentar');
+btnErroTentarEl.addEventListener('click', () => {
+  closeModal(modalErro);
+  resetFase2();
+  buildBank();
+});
+
+btnSucessoOk.addEventListener('click', () => { closeModal(modalSucesso); });
+</script>
+</body>
+</html>
