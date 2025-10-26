@@ -95,10 +95,10 @@
   <!-- FASE 1 -->
   <div id="fase1" class="screen" aria-label="Fase 1">
     <h2 class="section-title">Fase 1</h2>
-    <p class="highlight">💡 Você tem <strong>7 vidas</strong> para acertar as possíveis <strong>10 letras do nome</strong>!</p>
+    <p class="highlight">💡 Você tem <strong>7 vidas</strong> para acertar as possíveis <strong>12 letras do nome</strong>!</p>
     <div class="game-stats">
       <div class="stat-box">
-        <p><strong>Acertos:</strong> <span id="acertos">0</span>/10</p>
+        <p><strong>Acertos:</strong> <span id="acertos">0</span>/12</p>
       </div>
       <div class="stat-box" id="vidas">
         <p><strong>Vidas:</strong></p>
@@ -151,7 +151,7 @@
 
 <script>
 // ===== Estado & constantes =====
-const correctLetters = ['A','C','E','I','J','L','M','O','R','U'];
+const correctLetters = ['A','B','E','F','I','J','L','N','O','R','S','U'];
 const TARGET = 'JULIA'; // validação sem acento
 const TARGET_REVEAL = 'JÚLIA'; // exibição com acento
 let vidas = 7;
