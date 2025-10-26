@@ -32,7 +32,7 @@
 
   /* ===== Tela inicial ===== */
   #inicio { align-items: center; text-align: center; gap: 8px; background: var(--panel); padding: 36px 48px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: min(90%, 520px); }
-  #inicio h1 { margin: 0; font-size: 2.0rem; color: var(--accent); letter-spacing: .5px; }
+  #inicio h1 { margin: 0; font-size: 2.2rem; color: var(--accent); letter-spacing: .5px; }
   #inicio p { margin: 6px 0 16px; font-size: 1.1rem; color: #444; }
   #comecar-btn { background-color: var(--accent); color: #fff; padding: 12px 26px; font-size: 1rem; font-weight: 600; border: none; border-radius: 12px; margin-top: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; }
   #comecar-btn:hover { background-color: #ff407e; transform: scale(1.05); }
@@ -45,8 +45,8 @@
   .stat-box { display: flex; align-items: center; gap: 6px; }
   .heart { color: #ff4d6d; font-size: 1.3rem; transition: opacity 0.3s ease, transform 0.3s ease; }
   .heart.lost { opacity: 0.3; transform: scale(0.8); }
-  .alphabet { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px; align-self: center; }
-  button.letter-btn { border: none; background: #fff; font-weight: 600; border-radius: 8px; padding: 10px; cursor: pointer; transition: background-color 0.4s ease, color 0.4s ease, transform 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .alphabet { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 6px; align-self: center; }
+  button.letter-btn { border: none; background: #fff; font-weight: 600; border-radius: 8px; padding: 14px; font-size: 1.1rem; cursor: pointer; transition: background-color 0.4s ease, color 0.4s ease, transform 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
   button.letter-btn:hover:not(.correct):not(.wrong) { background: #ffe0ec; }
   button.letter-btn:disabled { opacity: .6; cursor: not-allowed; }
   button.correct { background-color: #4caf50 !important; color: white !important; transform: scale(1.1); }
@@ -90,7 +90,6 @@
     <h1>🎀 Descubra o nome da bebê 🎀</h1>
     <p>Será que você consegue adivinhar o nome?</p>
     <button id="comecar-btn">Começar</button>
-    <p><em>(Jogo criado por Michel e Dominique)</em></p>
   </div>
 
   <!-- FASE 1 -->
