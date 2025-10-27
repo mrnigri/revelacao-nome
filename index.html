@@ -40,7 +40,7 @@
   /* ===== Fases ===== */
   #fase1, #fase2 { flex-direction: column; gap: 8px; background: var(--panel); padding: 25px 35px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: min(90%, 520px); }
   .section-title { color: var(--accent); font-size: 1.6rem; font-weight: 700; margin: 0 0 4px 0; align-self: flex-start; }
-  .highlight { background-color: #fff0f5; border: 2px solid #ffd6e8; padding: 8px 14px; border-radius: 10px; font-weight: 400; font-size: 1.05rem; color: #333; margin-bottom: 6px; }
+  .highlight { background-color: #fff0f5; border: 2px solid #ffd6e8; padding: 8px 14px; border-radius: 10px; font-weight: 500; font-size: 1.05rem; color: #333; margin-bottom: 6px; }
   .game-stats { display: flex; justify-content: flex-start; gap: 20px; font-size: 1.1rem; width: 100%; margin-bottom: 2px; }
   .stat-box { display: flex; align-items: center; gap: 6px; }
   .heart { color: #ff4d6d; font-size: 1.3rem; transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -88,14 +88,14 @@
   <!-- INÍCIO -->
   <div id="inicio" class="screen visible fade-in" aria-label="Tela inicial">
     <h1>🎀 Descubra o nome da bebê 🎀</h1>
-    <p>Criamos esse jogo para você descobrir o nome da nossa nova filha enquanto se diverte. Será que você consegue?</p>
+    <p>Criamos esse jogo para você descobrir o nome da nossa nova filha enquanto se diverte. Será que você consegue?</br></br>Com carinho, Michel e Dodô</p>
     <button id="comecar-btn">Começar</button>
   </div>
 
   <!-- FASE 1 -->
   <div id="fase1" class="screen" aria-label="Fase 1">
     <h2 class="section-title">Fase 1</h2>
-    <p class="highlight">💡 Nesta 1ª fase você tem <strong>7 vidas</strong> para acertar as possíveis <strong>12 letras do nome</strong>! </br> Na próxima fase te daremos mais dicas para descobrir o nome.</p>
+    <p class="highlight">💡 Nesta 1ª fase você tem <strong>7 vidas</strong> para acertar <strong>12 letras</strong>! </br> Na próxima fase você irá usar algumas das 12 letras para descobrir o nome, com mais dicas.</p>
     <div class="game-stats">
       <div class="stat-box">
         <p><strong>Acertos:</strong> <span id="acertos">0</span>/12</p>
